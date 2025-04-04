@@ -243,7 +243,7 @@ const MovieDetailsPage: React.FC = () => {
                 </div>
               )}
 
-              {movie.runtime && (
+              {movie.runtime !== undefined && movie.runtime > 0 && (
                 <div>
                   <span className="block text-gray-400 uppercase text-sm tracking-wider mb-1">
                     Runtime
