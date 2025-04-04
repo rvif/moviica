@@ -12,17 +12,14 @@ import {
   Text,
   Spinner,
   Button,
-  Heading,
   SegmentedControl,
   Separator,
 } from "@radix-ui/themes";
 import {
-  CubeIcon,
   Component1Icon,
   ListBulletIcon,
   UploadIcon,
   Share1Icon,
-  TableIcon,
   CookieIcon,
 } from "@radix-ui/react-icons";
 
