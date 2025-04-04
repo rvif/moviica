@@ -5,7 +5,7 @@ import { useSearchStore } from "../store/searchStore";
 
 import type { Movie } from "../types/movie";
 import MovieCard from "../components/MovieCard";
-import { Spinner, Box, Flex } from "@radix-ui/themes";
+import { Spinner, Box, Flex, Separator } from "@radix-ui/themes";
 
 interface SearchState {
   searchTerm: string;
@@ -50,6 +50,7 @@ const Homepage: React.FC = () => {
 
   return (
     <>
+      <Separator size="4" />
       <Box pl="5" pt="4">
         <div className="mb-6 md:mb-8 pt-4">
           <h1 className="text-1xl md:text-2xl font-light font-dm text-white">
