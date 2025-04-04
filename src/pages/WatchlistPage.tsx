@@ -4,6 +4,7 @@ import {
   getWatchlist,
   removeMovieFromWatchlist,
   toggleWatchedStatus,
+  getWhereToWatchLinks,
 } from "../service/watchService";
 import { Movie } from "../types/movie";
 import {
@@ -14,6 +15,10 @@ import {
   Button,
   SegmentedControl,
   Separator,
+  Table,
+  Badge,
+  Tooltip,
+  IconButton,
 } from "@radix-ui/themes";
 import {
   Component1Icon,
@@ -21,10 +26,12 @@ import {
   UploadIcon,
   Share1Icon,
   CookieIcon,
+  TrashIcon,
+  EyeClosedIcon,
+  EyeOpenIcon,
 } from "@radix-ui/react-icons";
 
 import WatchlistGridItem from "../components/WatchlistGridItem";
-import WatchlistListItem from "../components/WatchlistListItem";
 
 type WatchlistFilter = "all" | "watched" | "unwatched";
 type DisplayMode = "grid" | "list";
@@ -137,7 +144,6 @@ const WatchlistPage = () => {
             mb="6"
             gap="4"
           >
-            {/* Title and Count */}
             <div>
               <Text size="8" className="font-light text-white font-dm mb-1">
                 Your watch-list
@@ -151,7 +157,6 @@ const WatchlistPage = () => {
             </div>
 
             <Flex gap="4" align="center" wrap="wrap">
-              {" "}
               <SegmentedControl.Root
                 value={activeFilter}
                 onValueChange={(value) =>
@@ -167,6 +172,7 @@ const WatchlistPage = () => {
                   To Watch
                 </SegmentedControl.Item>
               </SegmentedControl.Root>
+
               <SegmentedControl.Root
                 value={displayMode}
                 onValueChange={(value) => setDisplayMode(value as DisplayMode)}
@@ -183,7 +189,6 @@ const WatchlistPage = () => {
           </Flex>
 
           {filteredWatchlist.length === 0 ? (
-            //No Filter Results State
             <Box height="calc(100vh - 356px)">
               <Flex
                 className="h-full"
@@ -201,7 +206,6 @@ const WatchlistPage = () => {
               </Flex>
             </Box>
           ) : displayMode === "grid" ? (
-            // Grid View
             <Box height="full">
               <div className="!py-6 !px-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-5">
                 {filteredWatchlist.map((movie) => (
@@ -215,46 +219,231 @@ const WatchlistPage = () => {
               </div>
             </Box>
           ) : (
-            //  List View
-            <Box height="full">
-              <div className="!p-2 bg-[#101211] rounded-sm overflow-hidden border border-[#2a2c2b] !my-4 font-dm text-xs uppercase text-white font-medium ">
-                <Flex justify="between" align="center" className="!mt-1">
-                  <div className="!pl-8 !md:pl-20">Movie</div>
-                  <Flex justify="between" className="!gap-x-10" align="center">
-                    <div className="text-center">Status</div>
-                    <div className="!px-48 text-center">Watch On</div>
-                    <div className="text-right !pr-16">Actions</div>
-                  </Flex>
-                </Flex>
+            <Table.Root
+              variant="surface"
+              size="2"
+              style={{ marginTop: "1rem", marginBottom: "1rem" }}
+            >
+              <Table.Header>
+                <Table.Row align="center">
+                  <Table.ColumnHeaderCell
+                    style={{ minWidth: "70px" }}
+                    className="!pl-4"
+                  >
+                    Poster
+                  </Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell style={{ minWidth: "150px" }}>
+                    Title
+                  </Table.ColumnHeaderCell>
 
-                {filteredWatchlist.map((movie) => (
-                  <WatchlistListItem
-                    key={movie.id}
-                    movie={movie}
-                    onRemove={handleRemove}
-                    onToggleWatched={handleToggleWatched}
-                  />
-                ))}
-              </div>
-            </Box>
+                  <Table.ColumnHeaderCell
+                    justify="center"
+                    style={{ minWidth: "120px" }}
+                    className="w-[500px]"
+                  >
+                    Status
+                  </Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell
+                    justify="center"
+                    style={{ minWidth: "500px" }}
+                    className="w-[500px]"
+                  >
+                    Watch On
+                  </Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell
+                    justify="end"
+                    style={{ minWidth: "150px" }}
+                    className="!pr-20 w-[100px]"
+                  >
+                    Actions
+                  </Table.ColumnHeaderCell>
+                </Table.Row>
+              </Table.Header>
+
+              <Table.Body>
+                {filteredWatchlist.map((movie) => {
+                  const posterUrl = movie.poster_path
+                    ? `https://image.tmdb.org/t/p/w92${movie.poster_path}`
+                    : null;
+                  const year = movie.release_date
+                    ? new Date(movie.release_date).getFullYear()
+                    : null;
+                  const streamingLinks = getWhereToWatchLinks(movie.title);
+
+                  return (
+                    <Table.Row key={movie.id} align="center">
+                      <Table.Cell style={{ width: "70px" }}>
+                        <Link
+                          to={`/movie/${movie.id}`}
+                          style={{
+                            display: "block",
+                            width: "56px",
+                            height: "80px",
+                            overflow: "hidden",
+                            borderRadius: "var(--radius-2)",
+                            background: "var(--color-surface-hover)",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {posterUrl ? (
+                            <img
+                              src={posterUrl}
+                              alt={`${movie.title} poster`}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                              loading="lazy"
+                            />
+                          ) : (
+                            <Flex
+                              align="center"
+                              justify="center"
+                              style={{ width: "100%", height: "100%" }}
+                            >
+                              <Text size="1" color="gray">
+                                No Image
+                              </Text>
+                            </Flex>
+                          )}
+                        </Link>
+                      </Table.Cell>
+
+                      <Table.RowHeaderCell>
+                        <Link
+                          to={`/movie/${movie.id}`}
+                          style={{ color: "inherit", textDecoration: "none" }}
+                          className="group/link"
+                        >
+                          <Text
+                            weight="medium"
+                            className="font-dm text-white group-hover/link:text-teal-400 transition-colors text-sm sm:text-base"
+                            title={movie.title}
+                          >
+                            {movie.title}
+                          </Text>
+                          {year && (
+                            <Text
+                              as="p"
+                              size="1"
+                              className="text-gray-400 font-dm mt-0.5"
+                            >
+                              {year}
+                            </Text>
+                          )}
+                        </Link>
+                      </Table.RowHeaderCell>
+
+                      <Table.Cell justify="center">
+                        <Badge
+                          variant="soft"
+                          size="1"
+                          color={movie.watched ? "green" : "yellow"}
+                        >
+                          {movie.watched ? "Watched" : "To watch"}
+                        </Badge>
+                      </Table.Cell>
+                      <Table.Cell justify="center">
+                        <Flex
+                          gap="1"
+                          wrap="wrap"
+                          justify="between"
+                          align="center"
+                          style={{ maxWidth: "500px" }}
+                          className="!px-20"
+                        >
+                          {streamingLinks.length > 0 ? (
+                            streamingLinks.map((platform) => (
+                              <Tooltip
+                                key={platform.name}
+                                content={`Watch on ${platform.name}`}
+                              >
+                                <a
+                                  href={platform.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  aria-label={`Watch on ${platform.name}`}
+                                  style={{
+                                    color: "var(--gray-11)",
+                                    textDecoration: "none",
+                                  }}
+                                >
+                                  <Text
+                                    size="1"
+                                    className="font-dm lowercase px-1 hover:underline"
+                                  >
+                                    {platform.name}
+                                  </Text>
+                                </a>
+                              </Tooltip>
+                            ))
+                          ) : (
+                            <Text size="1" color="gray">
+                              N/A
+                            </Text>
+                          )}
+                        </Flex>
+                      </Table.Cell>
+
+                      <Table.Cell justify="end">
+                        <Flex
+                          gap={{ initial: "1", xs: "2", sm: "3" }}
+                          justify="between"
+                          align="center"
+                          className=" !pr-15"
+                        >
+                          <Tooltip
+                            content={
+                              movie.watched
+                                ? "Mark as unwatched"
+                                : "Mark as watched"
+                            }
+                          >
+                            <IconButton
+                              size="1"
+                              variant="ghost"
+                              color={movie.watched ? "green" : "gray"}
+                              onClick={() => handleToggleWatched(movie.id)}
+                            >
+                              {movie.watched ? (
+                                <EyeClosedIcon />
+                              ) : (
+                                <EyeOpenIcon />
+                              )}
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip content="Remove from watchlist">
+                            <IconButton
+                              size="1"
+                              color="red"
+                              variant="ghost"
+                              onClick={() => handleRemove(movie.id)}
+                            >
+                              <TrashIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </Flex>
+                      </Table.Cell>
+                    </Table.Row>
+                  );
+                })}
+              </Table.Body>
+            </Table.Root>
           )}
 
-          {/*//!TODO: Export and Share Section, implem soon */}
-          {/* only show if there are movies in the *entire* watchlist */}
-          <Separator size="4" />
+          <Separator size="4" className="!mt-8" />
           {watchlist.length > 0 && (
             <Box className="!mt-4 !p-5 md:mt-12 bg-[#101211] rounded-lg !md:p-6 border border-[#2a2c2b]">
               <Text size="4" className="font-dm font-medium text-white">
                 Manage Watchlist
               </Text>
               <Flex wrap="wrap" gap="3" className="!mt-4">
-                {" "}
-                <Button variant="soft" color="gray">
-                  {" "}
+                <Button variant="soft" color="gray" disabled>
                   <UploadIcon width="16" height="16" />
                   Export as CSV (Soon)
                 </Button>
-                <Button variant="soft" color="gray">
+                <Button variant="soft" color="gray" disabled>
                   <Share1Icon width="16" height="16" />
                   Share Watchlist (Soon)
                 </Button>
