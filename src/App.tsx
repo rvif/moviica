@@ -1,4 +1,4 @@
-import { Theme, ThemePanel } from "@radix-ui/themes";
+import { Theme } from "@radix-ui/themes";
 import "./App.css";
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";

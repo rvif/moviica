@@ -39,13 +39,13 @@ const MovieDetailsPage: React.FC = () => {
     retry: 1,
   });
 
-  const { data: credits, isLoading: isLoadingCredits } = useQuery({
+  const { data: credits } = useQuery({
     queryKey: ["movieCredits", movieId],
     queryFn: () => tmdb.getMovieCredits(movieId!),
     enabled: !!movieId && !!movie,
   });
 
-  const { data: videos, isLoading: isLoadingVideos } = useQuery({
+  const { data: videos } = useQuery({
     queryKey: ["movieVideos", movieId],
     queryFn: () => tmdb.getMovieVideos(movieId!),
     enabled: !!movieId && !!movie,
@@ -249,7 +249,7 @@ const MovieDetailsPage: React.FC = () => {
               </div>
             )}
 
-            {movie.vote_average > 0 && (
+            {movie.vote_average !== undefined && movie.vote_average > 0 && (
               <div>
                 <span className="block text-gray-400 uppercase text-sm tracking-wider mb-1">
                   Rating

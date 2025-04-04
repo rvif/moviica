@@ -1,6 +1,6 @@
 import { Movie } from "../types/movie";
 
-const WATCHLIST_KEY = "user_watchlist"; // change when feature to add more watchlists is added
+const WATCHLIST_KEY = "user_watchlist"; //TODO: change when feature to add more watchlists is added
 
 export const getWatchlist = (): Movie[] => {
   return JSON.parse(localStorage.getItem(WATCHLIST_KEY) || "[]");
